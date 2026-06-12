@@ -1,4 +1,4 @@
-# Fraud Alert Simulator
+# AlertIQ
 
 Interactive fraud analyst training tool built for the **Fraud Analysis Bootcamp**.
 
