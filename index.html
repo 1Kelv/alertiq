@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Alert Simulator — Fraud Analysis Bootcamp</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 60px;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header { text-align: center; margin-bottom: 24px; }
+header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+header p  { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+/* ── TABS ───────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn.active { background: #3b82f6; color: #fff; }
+.tab-btn:hover:not(.active) { color: #e2e8f0; }
+
+/* ── SCORE BAR ──────────────────────────────────────────── */
+.score-bar {
+  display: flex;
+  gap: 20px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #94a3b8;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.score-bar span strong { color: #fff; font-size: 17px; }
+
+/* ── TIMER ──────────────────────────────────────────────── */
+.timer-wrap {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+.timer-wrap.show { display: flex; }
+.timer-display {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+.timer-display.warn  { color: #f59e0b; }
+.timer-display.crit  { color: #ef4444; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+/* ── PROGRESS ───────────────────────────────────────────── */
+.progress-wrap {
+  width: 100%;
+  max-width: 660px;
+  height: 4px;
+  background: #1e293b;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ── SET LABEL ──────────────────────────────────────────── */
+.set-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3b82f6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* ── ALERT CARD ─────────────────────────────────────────── */
+.alert-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 22px;
+  width: 100%;
+  max-width: 660px;
+  margin-bottom: 16px;
+}
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.alert-id {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 1px;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.risk-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.risk-LOW    { background:rgba(34,197,94,0.12);  border:1px solid rgba(34,197,94,0.3);  color:#22c55e; }
+.risk-MEDIUM { background:rgba(234,179,8,0.12);  border:1px solid rgba(234,179,8,0.3);  color:#eab308; }
+.risk-HIGH   { background:rgba(239,68,68,0.12);  border:1px solid rgba(239,68,68,0.3);  color:#ef4444; }
+.risk-EXAM   { background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.3); color:#a78bfa; }
+
+/* ── FIELDS GRID ────────────────────────────────────────── */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.field {
+  background: #0f1117;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 11px 13px;
+}
+.field-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.field-value       { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.field-value.flag  { color: #f87171; }
+.field-value.safe  { color: #4ade80; }
+.field-value.warn  { color: #fbbf24; }
+
+.vel-tag {
+  display: inline-block;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* ── CASE STUDY BLOCK ───────────────────────────────────── */
+.case-block {
+  background: #0f1117;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #94a3b8;
+}
+.case-block h4 { font-size: 11px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.case-block ul { padding-left: 18px; }
+.case-block li { margin-bottom: 3px; }
+.case-block li.red  { color: #f87171; }
+.case-block li.green { color: #4ade80; }
+
+/* ── REASON BOX ─────────────────────────────────────────── */
+.reason-box {
+  width: 100%;
+  background: #0f1117;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 13px;
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  margin-bottom: 14px;
+  transition: border-color 0.15s;
+}
+.reason-box:focus { outline: none; border-color: #3b82f6; }
+.reason-box::placeholder { color: #475569; }
+.reason-hint { font-size: 11px; color: #475569; margin-bottom: 10px; margin-top: -10px; }
+
+/* ── DECISION BUTTONS ───────────────────────────────────── */
+.decisions { display: flex; gap: 10px; }
+.dec-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dec-btn:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+.dec-btn:active { transform: translateY(0); }
+.dec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dec-approve  { background:rgba(34,197,94,0.12);  border-color:rgba(34,197,94,0.4);  color:#22c55e; }
+.dec-escalate { background:rgba(234,179,8,0.12);  border-color:rgba(234,179,8,0.4);  color:#eab308; }
+.dec-block    { background:rgba(239,68,68,0.12);  border-color:rgba(239,68,68,0.4);  color:#ef4444; }
+
+/* ── FEEDBACK ───────────────────────────────────────────── */
+.feedback {
+  display: none;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 18px 22px;
+  width: 100%;
+  max-width: 660px;
+  margin-bottom: 14px;
+  animation: fadeUp 0.2s ease;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.feedback.show { display: block; }
+.feedback-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.verdict-correct { color: #22c55e; }
+.verdict-partial  { color: #eab308; }
+.verdict-wrong    { color: #ef4444; }
+.feedback-body { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+.chips { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-flag { font-size:11px; padding:3px 10px; border-radius:6px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#f87171; }
+.chip-good { font-size:11px; padding:3px 10px; border-radius:6px; background:rgba(34,197,94,0.1);  border:1px solid rgba(34,197,94,0.25);  color:#4ade80; }
+
+/* ── NEXT BUTTON ────────────────────────────────────────── */
+.next-btn {
+  width: 100%;
+  max-width: 660px;
+  padding: 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: none;
+  margin-bottom: 10px;
+}
+.next-btn:hover { background: #2563eb; }
+.next-btn.show { display: block; }
+
+/* ── RESULTS SCREEN ─────────────────────────────────────── */
+.results-screen { display: none; width: 100%; max-width: 660px; }
+.results-screen.show { display: block; }
+
+.results-hero {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 28px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.results-hero h2 { font-size: 20px; margin-bottom: 4px; }
+.pct { font-size: 72px; font-weight: 800; line-height: 1; margin: 16px 0 8px; }
+.grade-A { color: #22c55e; }
+.grade-B { color: #84cc16; }
+.grade-C { color: #eab308; }
+.grade-D { color: #f97316; }
+.grade-F { color: #ef4444; }
+.grade-label { font-size: 14px; color: #94a3b8; }
+
+.results-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stat-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-box .sv { font-size: 24px; font-weight: 800; color: #fff; }
+.stat-box .sl { font-size: 11px; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.6px; }
+
+.results-breakdown {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.results-breakdown h3 { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #0f1117;
+  font-size: 13px;
+  gap: 8px;
+}
+.result-row:last-child { border-bottom: none; }
+.result-row .rr { font-size: 11px; color: #475569; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── PRINT REPORT ────────────────────────────────────────── */
+.report-btn {
+  width: 100%;
+  padding: 14px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background 0.15s;
+}
+.report-btn:hover { background: #334155; }
+
+.restart-btn {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid #334155;
+  color: #64748b;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.restart-btn:hover { color: #e2e8f0; border-color: #64748b; }
+
+/* ── TIME-UP OVERLAY ────────────────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 16px;
+}
+.overlay.show { display: flex; }
+.overlay h2 { font-size: 28px; font-weight: 800; color: #ef4444; }
+.overlay p  { font-size: 15px; color: #94a3b8; max-width: 360px; }
+.overlay button {
+  padding: 12px 28px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── PRINT STYLES ───────────────────────────────────────── */
+@media print {
+  body { background: #fff !important; color: #000 !important; padding: 0; }
+  .tabs, .score-bar, .timer-wrap, .progress-wrap, .next-btn,
+  .report-btn, .restart-btn, .alert-card, .feedback, .overlay { display: none !important; }
+  .results-screen { display: block !important; }
+  .results-hero, .results-stats .stat-box, .results-breakdown {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+  }
+  .pct, .sv, .grade-label, .grade-A, .grade-B, .grade-C, .grade-D, .grade-F { color: #000 !important; }
+  .results-hero h2, .results-breakdown h3, .grade-label { color: #333 !important; }
+  .result-row { border-bottom: 1px solid #eee !important; color: #000 !important; }
+  .rr { color: #666 !important; }
+  .print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+  }
+  .print-header h1 { font-size: 20px; }
+  .print-header p  { font-size: 13px; color: #555; }
+}
+.print-header { display: none; }
+</style>
+</head>
+<body>
+
+<div class="print-header">
+  <h1>Fraud Analysis Bootcamp — Performance Report</h1>
+  <p id="printMeta"></p>
+</div>
+
+<header>
+  <h1>🔍 Fraud Alert Simulator</h1>
+  <p>Fraud Analysis Bootcamp — Interactive Alert Review</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="setMode('set1')">Set 1 · Basic</button>
+  <button class="tab-btn" onclick="setMode('set2')">Set 2 · Intermediate</button>
+  <button class="tab-btn" onclick="setMode('mixed')">Mixed</button>
+  <button class="tab-btn" onclick="setMode('exam')">⏱ Set 3 · Exam</button>
+</div>
+
+<div class="score-bar">
+  <span>Score <strong id="scoreDisplay">0</strong></span>
+  <span>Correct <strong id="correctDisplay">0</strong></span>
+  <span>Alert <strong id="alertNumDisplay">1</strong> / <span id="totalDisplay">—</span></span>
+</div>
+
+<div class="timer-wrap" id="timerWrap">
+  <span>⏱ Time remaining:</span>
+  <span class="timer-display" id="timerDisplay">45:00</span>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<div id="mainView">
+  <div class="set-label" id="setLabel">ALERT SET 1 — BASIC</div>
+
+  <div class="alert-card" id="alertCard">
+    <div class="alert-header">
+      <span class="alert-id" id="alertId">—</span>
+      <span class="risk-badge" id="riskBadge">—</span>
+    </div>
+    <div id="caseBlock"></div>
+    <div class="fields" id="fieldsGrid"></div>
+    <textarea class="reason-box" id="reasonInput" placeholder="Write your reasoning here — what signals are you seeing? (required before submitting)"></textarea>
+    <p class="reason-hint" id="reasonHint"></p>
+    <div class="decisions">
+      <button class="dec-btn dec-approve"  onclick="decide('Approve')">✓ Approve</button>
+      <button class="dec-btn dec-escalate" onclick="decide('Escalate')">⚠ Escalate</button>
+      <button class="dec-btn dec-block"    onclick="decide('Block')">✕ Block</button>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackPanel">
+    <div class="feedback-title" id="feedbackTitle"></div>
+    <div class="feedback-body" id="feedbackBody"></div>
+    <div class="chips" id="chipsList"></div>
+  </div>
+
+  <button class="next-btn" id="nextBtn" onclick="nextAlert()">Next Alert →</button>
+</div>
+
+<!-- Results -->
+<div class="results-screen" id="resultsScreen">
+  <div class="results-hero">
+    <h2>Session Complete</h2>
+    <div class="pct" id="gradeDisplay">—%</div>
+    <p class="grade-label" id="gradeLabel"></p>
+  </div>
+  <div class="results-stats" id="resultsStats"></div>
+  <div class="results-breakdown">
+    <h3>Alert Breakdown</h3>
+    <div id="resultsBreakdown"></div>
+  </div>
+  <button class="report-btn" onclick="printReport()">🖨 Print / Save Score Report</button>
+  <button class="restart-btn" onclick="restart()">Start New Session</button>
+</div>
+
+<!-- Time-up overlay -->
+<div class="overlay" id="timeUpOverlay">
+  <h2>⏰ Time's Up!</h2>
+  <p>Your 45-minute exam window has closed. Your score has been recorded for the alerts you completed.</p>
+  <button onclick="forceResults()">See My Results</button>
+</div>
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+
+const SET1 = [
+  {
+    id:'A101', set:1,
+    fields:{'Account Age':'3 years','Amount':'£52','Country':'UK','IP Country':'UK','Device':'Known','Past Behaviour':'Normal grocery spend'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['Matching IP & country','Known device','Low amount matches pattern'],
+    explanation:'No red flags. Established customer making a small in-pattern transaction from a known device. IP and country align. Approve with confidence.',
+  },
+  {
+    id:'A102', set:1,
+    fields:{'Account Age':'2 years','Amount':'£980','Country':'UK','IP Country':'Brazil','Device':'New','Past Behaviour':'Usually low spend'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['IP mismatch — Brazil vs UK card','New device','High amount vs usual spend','Sudden spend spike'],
+    goodSigns:[],
+    explanation:'Multiple simultaneous red flags: IP from Brazil on a UK card, a new device, and a transaction far above the customer\'s normal spend. Classic ATO pattern. Block and contact customer.',
+  },
+  {
+    id:'A103', set:1,
+    fields:{'Account Age':'5 days','Amount':'£120','Country':'UK','IP Country':'UK','Device':'New','Past Behaviour':'First transaction'},
+    riskLevel:'MEDIUM', correctDecision:'Escalate',
+    flags:['Very new account (5 days)','New device','No transaction history'],
+    goodSigns:['IP matches country','Moderate amount'],
+    explanation:'A 5-day-old account making its first transaction is a pattern common in application fraud and mule accounts. IPs match and amount is moderate, but there is insufficient history to approve. Escalate for ID checks.',
+  },
+  {
+    id:'A104', set:1,
+    fields:{'Account Age':'1 year','Amount':'£75','Country':'UK','IP Country':'UK','Device':'Known','Past Behaviour':'Regular pattern'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['Consistent country & IP','Known device','Amount within normal range','Regular history'],
+    explanation:'Clean alert. All signals align with normal customer behaviour. Known device, matching IPs, consistent spend pattern. Approve.',
+  },
+  {
+    id:'A105', set:1,
+    fields:{'Account Age':'4 years','Amount':'£1,450','Country':'UK','IP Country':'Poland','Device':'New','Past Behaviour':'Sudden high value'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['IP from Poland on UK card','New device','Unusually high amount','Sudden behaviour change'],
+    goodSigns:['Established account (4 years)'],
+    explanation:'Even on an established account, an overseas IP, new device, and sudden high-value transaction together form a strong ATO signal. Account age cannot outweigh three concurrent red flags.',
+  },
+  {
+    id:'A106', set:1,
+    fields:{'Account Age':'8 months','Amount':'£210','Country':'UK','IP Country':'UK','Device':'Known','Past Behaviour':'Regular online shopper'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['IP matches','Known device','Consistent with online shopping history'],
+    explanation:'Regular online shopper using a known device. Amount is reasonable for typical e-commerce spend. No concerns.',
+  },
+  {
+    id:'A107', set:1,
+    fields:{'Account Age':'2 weeks','Amount':'£850','Country':'UK','IP Country':'UK','Device':'New','Past Behaviour':'No history'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['Very new account (2 weeks)','No transaction history','High first transaction','New device'],
+    goodSigns:[],
+    explanation:'Brand-new account with no history attempting a high-value transaction. Textbook application fraud or mule account pattern. Block and refer for identity verification.',
+  },
+  {
+    id:'A108', set:1,
+    fields:{'Account Age':'6 years','Amount':'£340','Country':'France','IP Country':'France','Device':'Known','Past Behaviour':'Frequent traveller'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['IP matches transaction country','Known device','Travel history supports location'],
+    explanation:'False positive trap. The customer is a frequent traveller — France is consistent with their history. IP and country both match, and the known device confirms the legitimate customer. Blocking harms a genuine customer.',
+  },
+];
+
+const SET2 = [
+  {
+    id:'B201', set:2,
+    fields:{'Behaviour Change':'High','Velocity':'3 in 2 mins','Merchant Type':'Electronics','Email Risk':'Low','Account Age':'1 year','Amount':'£899'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['High behaviour change','Velocity: 3 txns in 2 minutes','Electronics = high-resale fraud target'],
+    goodSigns:['Low email risk'],
+    explanation:'High velocity on electronics is a primary ATO indicator. Fraudsters buy resalable goods quickly before the victim notices. Low email risk is a mild positive but cannot offset three strong concurrent risk signals.',
+  },
+  {
+    id:'B202', set:2,
+    fields:{'Behaviour Change':'None','Velocity':'1','Merchant Type':'Supermarket','Email Risk':'Low','Account Age':'3 years','Amount':'£64'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['No behaviour change','Single transaction','Low-risk merchant','Low email risk','Established account'],
+    explanation:'Routine supermarket purchase with no anomalies. Established customer, no velocity, no behaviour change, low email risk. Approve.',
+  },
+  {
+    id:'B203', set:2,
+    fields:{'Behaviour Change':'Medium','Velocity':'5 in 10 mins','Merchant Type':'Gift Cards','Email Risk':'High','Account Age':'4 months','Amount':'£420'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['5 transactions in 10 minutes','Gift cards — anonymous, easily resold','High email risk (email recently changed)','Medium behaviour change','Relatively new account'],
+    goodSigns:[],
+    explanation:'The most dangerous combination: high velocity on gift cards with a high email risk score — a hallmark ATO pattern. A recently changed email on a young account buying gift cards at speed. Block immediately and escalate for account review.',
+  },
+  {
+    id:'B204', set:2,
+    fields:{'Behaviour Change':'Travel history match','Velocity':'1','Merchant Type':'Hotel','Email Risk':'Low','Account Age':'5 years','Amount':'£220'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['Travel history supports hotel booking','Single transaction','Low email risk','Established account'],
+    explanation:'False positive. Travel history matches the hotel booking location. All indicators are clean. Blocking harms a genuine customer — false positives are a real business cost.',
+  },
+  {
+    id:'B205', set:2,
+    fields:{'Behaviour Change':'High','Velocity':'2 in 5 mins','Merchant Type':'Cryptocurrency','Email Risk':'Medium','Account Age':'7 months','Amount':'£1,200'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['High behaviour change','Velocity: 2 txns in 5 minutes','Crypto = irreversible, unrecoverable','Medium email risk','High amount'],
+    goodSigns:[],
+    explanation:'Cryptocurrency purchases are irreversible — there is no chargeback. Combined with high behaviour change, velocity, and a medium email risk, this is extremely high risk. Block before funds move.',
+  },
+  {
+    id:'B206', set:2,
+    fields:{'Behaviour Change':'Low','Velocity':'1','Merchant Type':'Pharmacy','Email Risk':'Low','Account Age':'2 years','Amount':'£38'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[], goodSigns:['Low behaviour change','Single transaction','Low amount','Established account'],
+    explanation:'Low-value pharmacy purchase with no risk indicators. Approve.',
+  },
+  {
+    id:'B207', set:2,
+    fields:{'Behaviour Change':'Medium','Velocity':'4 in 15 mins','Merchant Type':'Electronics','Email Risk':'Low','Account Age':'3 years','Amount':'£560'},
+    riskLevel:'MEDIUM', correctDecision:'Escalate',
+    flags:['Medium behaviour change','Velocity: 4 txns in 15 mins','Electronics merchant'],
+    goodSigns:['Low email risk','Established account (3 years)'],
+    explanation:'Borderline case. Velocity on electronics with a behaviour change is concerning, but the established account and clean email risk suggest this could be a genuine purchase. Escalate rather than block outright — senior analyst review is appropriate.',
+  },
+];
+
+const SET3 = [
+  {
+    id:'C301', set:3, examDuration: 45*60,
+    caseTitle:'CASE 1 — Account Takeover (ATO)',
+    profile:['4-year customer','UK based','Regular supermarket & fuel spend'],
+    recentActivity:['Password reset at 02:14 AM','New device registered','£890 electronics purchase','New delivery address added'],
+    fields:{'Account Age':'4 years','Amount':'£890','Country':'UK','IP Country':'UK','Device':'New','Velocity':'3 in 30 mins','Merchant Type':'Electronics','Email Risk':'Medium'},
+    riskLevel:'HIGH', correctDecision:'Block',
+    flags:['Password reset at 2AM — off-hours access','New device immediately followed by purchase','New delivery address','Electronics high-velocity cluster','Medium email risk'],
+    goodSigns:['IP matches UK','Established account'],
+    explanation:'Classic ATO pattern. A 2AM password reset followed immediately by a new device, new delivery address, and a high-value electronics purchase is a textbook account takeover sequence. Each event alone might be acceptable — together they are definitive. Block, restrict the account, and trigger a customer contact.',
+  },
+  {
+    id:'C302', set:3, examDuration: 45*60,
+    caseTitle:'CASE 2 — Genuine Customer (False Positive)',
+    profile:['Frequent traveller','Previous transactions in Spain, Italy, Portugal'],
+    recentActivity:['£220 hotel booking in Barcelona','Location: Spain','Known device used','No email or password changes'],
+    fields:{'Account Age':'5 years','Amount':'£220','Country':'Spain','IP Country':'Spain','Device':'Known','Velocity':'1','Merchant Type':'Hotel','Email Risk':'Low'},
+    riskLevel:'LOW', correctDecision:'Approve',
+    flags:[],
+    goodSigns:['Travel history matches Spain','Known device','No account changes','Single hotel transaction','IP matches location','Low email risk'],
+    explanation:'This is a false positive. The customer\'s travel history fully supports a Barcelona hotel booking. Blocking here harms a genuine customer and damages trust. Fraud prevention must balance stopping fraud with allowing genuine activity — both have real costs.',
+  },
+  {
+    id:'C303', set:3, examDuration: 45*60,
+    caseTitle:'CASE 3 — Friendly Fraud / Dispute',
+    profile:['2-year customer','Made 2 similar disputes in past 12 months'],
+    recentActivity:['Claims: "I did not make this transaction"','Transaction delivered to billing address','Correct CVV used','No new device or IP anomaly'],
+    fields:{'Account Age':'2 years','Amount':'£145','Country':'UK','IP Country':'UK','Device':'Known','Merchant Type':'Clothing','Email Risk':'Low','Prior Disputes':'2 in 12 months'},
+    riskLevel:'MEDIUM', correctDecision:'Escalate',
+    flags:['2 prior disputes in 12 months','Claim is first-party fraud pattern'],
+    goodSigns:['Delivered to billing address (own address)','Correct CVV','Known device','No IP anomaly'],
+    explanation:'This is a friendly fraud (first-party fraud) scenario. All transaction signals look genuine — correct CVV, own delivery address, known device — but the customer is claiming non-receipt. Combined with two prior disputes in 12 months, this is a pattern worth escalating. Do not auto-refund. Escalate for chargeback review and pattern analysis.',
+  },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let mode = 'set1';
+let queue = [], currentIndex = 0;
+let score = 0, correct = 0;
+let decided = false, history = [];
+let timerInterval = null, timerSeconds = 0;
+let sessionStartTime = null;
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQueue(m) {
+  if (m === 'set1')  return shuffle(SET1);
+  if (m === 'set2')  return shuffle(SET2);
+  if (m === 'exam')  return [...SET3];
+  return shuffle([...SET1, ...SET2]);
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['set1','set2','mixed','exam'][i] === m);
+  });
+  restart();
+}
+
+// ── TIMER ─────────────────────────────────────────────────────────────────────
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerSeconds = seconds;
+  document.getElementById('timerWrap').classList.add('show');
+  renderTimer();
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    renderTimer();
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('timeUpOverlay').classList.add('show');
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  document.getElementById('timerWrap').classList.remove('show');
+}
+
+function renderTimer() {
+  const m = Math.floor(timerSeconds/60);
+  const s = timerSeconds % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-display' + (timerSeconds <= 60 ? ' crit' : timerSeconds <= 300 ? ' warn' : '');
+}
+
+function forceResults() {
+  document.getElementById('timeUpOverlay').classList.remove('show');
+  showResults();
+}
+
+// ── RESTART ───────────────────────────────────────────────────────────────────
+function restart() {
+  stopTimer();
+  queue = buildQueue(mode);
+  currentIndex = 0; score = 0; correct = 0;
+  decided = false; history = [];
+  sessionStartTime = new Date();
+
+  document.getElementById('resultsScreen').classList.remove('show');
+  document.getElementById('mainView').style.display = '';
+  document.getElementById('feedbackPanel').classList.remove('show');
+  document.getElementById('nextBtn').classList.remove('show');
+  document.getElementById('timeUpOverlay').classList.remove('show');
+
+  if (mode === 'exam') startTimer(45*60);
+  else stopTimer();
+
+  updateScoreBar();
+  renderAlert();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAlert() {
+  const alert = queue[currentIndex];
+  decided = false;
+
+  document.getElementById('reasonInput').value = '';
+  document.getElementById('feedbackPanel').classList.remove('show');
+  document.getElementById('nextBtn').classList.remove('show');
+  document.querySelectorAll('.dec-btn').forEach(b => b.disabled = false);
+
+  document.getElementById('alertId').textContent = alert.id;
+
+  const badge = document.getElementById('riskBadge');
+  if (alert.set === 3) {
+    badge.textContent = 'EXAM CASE';
+    badge.className = 'risk-badge risk-EXAM';
+  } else {
+    badge.textContent = alert.riskLevel + ' RISK';
+    badge.className = 'risk-badge risk-' + alert.riskLevel;
+  }
+
+  const labels = { set1:'ALERT SET 1 — BASIC', set2:'ALERT SET 2 — INTERMEDIATE', mixed:'MIXED SET', exam:'SET 3 — FINAL EXAM (45 MIN)' };
+  document.getElementById('setLabel').textContent = labels[mode] || '';
+
+  // Case study block (Set 3)
+  const cb = document.getElementById('caseBlock');
+  if (alert.caseTitle) {
+    cb.innerHTML = `
+      <div class="case-block">
+        <h4>${alert.caseTitle}</h4>
+        <strong style="font-size:12px;color:#64748b">Customer Profile:</strong>
+        <ul style="margin:4px 0 10px">${alert.profile.map(x=>`<li>${x}</li>`).join('')}</ul>
+        <strong style="font-size:12px;color:#64748b">Recent Activity:</strong>
+        <ul style="margin:4px 0">${alert.recentActivity.map(x=>`<li class="${x.includes('?')||x.includes('reset')||x.includes('New')||x.includes('dispute')||x.includes('Claim')?'red':''}">${x}</li>`).join('')}</ul>
+      </div>`;
+    cb.style.display = 'block';
+  } else {
+    cb.innerHTML = '';
+    cb.style.display = 'none';
+  }
+
+  // Fields grid
+  const grid = document.getElementById('fieldsGrid');
+  grid.innerHTML = '';
+  for (const [key, val] of Object.entries(alert.fields)) {
+    const isFlag = val==='High' || val==='New' || (key==='IP Country' && val!==alert.fields['Country']) || (key==='Email Risk'&&val==='High');
+    const isWarn = val==='Medium' || (key==='Velocity'&&val.includes('in'));
+    const isGood = val==='Known' || val==='Low' || val==='None';
+    const valClass = isFlag?'flag':isWarn?'warn':isGood?'safe':'';
+    const valHtml = key==='Velocity'&&val.includes('in') ? `<span class="vel-tag">${val}</span>` : val;
+    grid.insertAdjacentHTML('beforeend',`
+      <div class="field">
+        <div class="field-label">${key}</div>
+        <div class="field-value ${valClass}">${valHtml}</div>
+      </div>`);
+  }
+
+  // Exam hint
+  document.getElementById('reasonHint').textContent = mode==='exam'
+    ? 'Exam: Include your decision, red flags identified, and any follow-up actions.'
+    : '';
+
+  updateScoreBar();
+  updateProgress();
+}
+
+function updateScoreBar() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('correctDisplay').textContent = correct;
+  document.getElementById('alertNumDisplay').textContent = Math.min(currentIndex+1, queue.length);
+  document.getElementById('totalDisplay').textContent = queue.length;
+}
+
+function updateProgress() {
+  const pct = queue.length > 0 ? (currentIndex / queue.length)*100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ── DECISION ──────────────────────────────────────────────────────────────────
+function decide(choice) {
+  if (decided) return;
+  const reason = document.getElementById('reasonInput').value.trim();
+  if (!reason) {
+    const box = document.getElementById('reasonInput');
+    box.style.borderColor = '#ef4444';
+    box.placeholder = 'Please write your reasoning before deciding…';
+    setTimeout(() => {
+      box.style.borderColor = '';
+      box.placeholder = 'Write your reasoning here — what signals are you seeing? (required before submitting)';
+    }, 2000);
+    return;
+  }
+
+  decided = true;
+  document.querySelectorAll('.dec-btn').forEach(b => b.disabled = true);
+
+  const alert = queue[currentIndex];
+  const isCorrect = choice === alert.correctDecision;
+  const isPartial = !isCorrect && (
+    (alert.correctDecision==='Block'    && choice==='Escalate') ||
+    (alert.correctDecision==='Escalate' && choice==='Block')
+  );
+
+  let pts = isCorrect ? 10 : isPartial ? 5 : 0;
+  if (isCorrect) correct++;
+  score += pts;
+
+  history.push({ alert, choice, isCorrect, isPartial, pts, reason });
+  showFeedback(alert, choice, isCorrect, isPartial, pts);
+  updateScoreBar();
+}
+
+function showFeedback(alert, choice, isCorrect, isPartial, pts) {
+  const panel = document.getElementById('feedbackPanel');
+  let icon, cls, label;
+  if (isCorrect)      { icon='✓'; cls='verdict-correct'; label=`Correct! +${pts} points`; }
+  else if (isPartial) { icon='~'; cls='verdict-partial';  label=`Partially correct — +${pts} points`; }
+  else                { icon='✕'; cls='verdict-wrong';    label=`Incorrect — 0 points`; }
+
+  document.getElementById('feedbackTitle').innerHTML =
+    `<span class="${cls}">${icon} ${label}</span> &nbsp;·&nbsp; <span style="color:#64748b;font-size:12px">Correct answer: <strong style="color:#e2e8f0">${alert.correctDecision}</strong></span>`;
+
+  document.getElementById('feedbackBody').textContent = alert.explanation;
+
+  const chips = document.getElementById('chipsList');
+  chips.innerHTML = '';
+  alert.flags.forEach(f => chips.insertAdjacentHTML('beforeend',`<span class="chip-flag">⚑ ${f}</span>`));
+  alert.goodSigns.forEach(g => chips.insertAdjacentHTML('beforeend',`<span class="chip-good">✓ ${g}</span>`));
+
+  panel.classList.add('show');
+  document.getElementById('nextBtn').textContent = currentIndex < queue.length-1 ? 'Next Alert →' : 'See Results →';
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+// ── NEXT / RESULTS ────────────────────────────────────────────────────────────
+function nextAlert() {
+  currentIndex++;
+  if (currentIndex >= queue.length) showResults();
+  else renderAlert();
+}
+
+function showResults() {
+  stopTimer();
+  document.getElementById('mainView').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+  const screen = document.getElementById('resultsScreen');
+  screen.classList.add('show');
+
+  const completed = history.length;
+  const maxScore = completed * 10;
+  const pct = maxScore > 0 ? Math.round((score/maxScore)*100) : 0;
+
+  const gradeEl = document.getElementById('gradeDisplay');
+  gradeEl.textContent = pct + '%';
+
+  let cls, label;
+  if      (pct>=90) { cls='grade-A'; label='Outstanding — Ready for live alerts'; }
+  else if (pct>=75) { cls='grade-B'; label='Good — Solid fraud instincts'; }
+  else if (pct>=60) { cls='grade-C'; label='Developing — Review your false negatives'; }
+  else if (pct>=45) { cls='grade-D'; label='Needs work — Revisit core risk indicators'; }
+  else              { cls='grade-F'; label='Keep practising — Focus on red flag patterns'; }
+
+  gradeEl.className = 'pct ' + cls;
+  document.getElementById('gradeLabel').textContent = label;
+
+  // Stat boxes
+  const elapsed = sessionStartTime ? Math.round((new Date()-sessionStartTime)/1000) : 0;
+  const mm = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const ss = String(elapsed%60).padStart(2,'0');
+  document.getElementById('resultsStats').innerHTML = `
+    <div class="stat-box"><div class="sv">${correct}/${completed}</div><div class="sl">Correct</div></div>
+    <div class="stat-box"><div class="sv">${score}</div><div class="sl">Points</div></div>
+    <div class="stat-box"><div class="sv">${mm}:${ss}</div><div class="sl">Time taken</div></div>`;
+
+  // Breakdown
+  const bd = document.getElementById('resultsBreakdown');
+  bd.innerHTML = '';
+  history.forEach(h => {
+    const icon = h.isCorrect ? '✓' : h.isPartial ? '~' : '✕';
+    const col  = h.isCorrect ? '#22c55e' : h.isPartial ? '#eab308' : '#ef4444';
+    bd.insertAdjacentHTML('beforeend',`
+      <div class="result-row">
+        <span style="color:${col};font-weight:700;min-width:48px">${icon} ${h.alert.id}</span>
+        <span class="rr">You: ${h.choice} · Correct: ${h.alert.correctDecision}</span>
+        <strong style="min-width:32px;text-align:right">+${h.pts}</strong>
+      </div>`);
+  });
+}
+
+// ── PRINT REPORT ───────────────────────────────────────────────────────────────
+function printReport() {
+  const now = new Date().toLocaleString('en-GB', {dateStyle:'long', timeStyle:'short'});
+  const mode_labels = {set1:'Set 1 – Basic',set2:'Set 2 – Intermediate',mixed:'Mixed',exam:'Set 3 – Final Exam'};
+  document.getElementById('printMeta').textContent =
+    `Mode: ${mode_labels[mode]}  ·  Date: ${now}  ·  Score: ${score} pts  ·  ${correct}/${history.length} correct`;
+  window.print();
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+restart();
+</script>
+</body>
+</html>
