@@ -3,22 +3,16 @@ import { useTheme } from './hooks/useTheme';
 import Topbar from './components/Topbar';
 import Landing from './components/Landing';
 import Simulator from './components/Simulator';
+import TrainerDashboard from './components/TrainerDashboard';
 
 export default function App() {
   const { theme, toggle } = useTheme();
-  const [screen, setScreen] = useState('home');
+  const [screen, setScreen]   = useState('home');
   const [simMode, setSimMode] = useState('set1');
 
-  function startSim(mode) {
-    setSimMode(mode);
-    setScreen('sim');
-    window.scrollTo(0, 0);
-  }
-
-  function goHome() {
-    setScreen('home');
-    window.scrollTo(0, 0);
-  }
+  function startSim(mode) { setSimMode(mode); setScreen('sim'); window.scrollTo(0,0); }
+  function goHome()        { setScreen('home'); window.scrollTo(0,0); }
+  function goTrainer()     { setScreen('trainer'); window.scrollTo(0,0); }
 
   return (
     <>
@@ -26,15 +20,19 @@ export default function App() {
         <h1>AlertIQ — Performance Report</h1>
         <p id="printMeta"></p>
       </div>
+
       <Topbar
         theme={theme}
         onToggleTheme={toggle}
         screen={screen}
         onHome={goHome}
         onStartTraining={() => startSim('set1')}
+        onTrainer={goTrainer}
       />
-      {screen === 'home' && <Landing onStart={startSim} />}
-      {screen === 'sim'  && <Simulator key={simMode} initialMode={simMode} onHome={goHome} />}
+
+      {screen === 'home'    && <Landing onStart={startSim} onTrainer={goTrainer} />}
+      {screen === 'sim'     && <Simulator key={simMode} initialMode={simMode} onHome={goHome} />}
+      {screen === 'trainer' && <TrainerDashboard onBack={goHome} />}
     </>
   );
 }

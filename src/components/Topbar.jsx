@@ -1,9 +1,7 @@
-export default function Topbar({ theme, onToggleTheme, screen, onHome, onStartTraining }) {
+export default function Topbar({ theme, onToggleTheme, screen, onHome, onStartTraining, onTrainer }) {
   return (
     <nav className="topbar">
-      <div className="topbar-logo" onClick={onHome}>
-        🔍 Alert<span>IQ</span>
-      </div>
+      <div className="topbar-logo" onClick={onHome}>🔍 Alert<span>IQ</span></div>
       <div className="topbar-right">
         <span className="theme-label">{theme === 'dark' ? 'Dark' : 'Light'}</span>
         <button className="theme-toggle" onClick={onToggleTheme} aria-label="Toggle theme" />
@@ -11,7 +9,10 @@ export default function Topbar({ theme, onToggleTheme, screen, onHome, onStartTr
           <button className="topbar-nav-btn" onClick={onHome}>← Home</button>
         )}
         {screen === 'home' && (
-          <button className="topbar-nav-btn primary" onClick={onStartTraining}>Start Training</button>
+          <>
+            <button className="topbar-nav-btn" onClick={onTrainer}>Trainer View</button>
+            <button className="topbar-nav-btn primary" onClick={onStartTraining}>Start Training</button>
+          </>
         )}
       </div>
     </nav>
