@@ -2,39 +2,45 @@
 
 Interactive fraud analyst training tool built for the **Fraud Analysis Bootcamp**.
 
-## How to use
+## Local development
 
-Open `index.html` in any browser — no install, no internet required.
+```bash
+npm install
+npm run dev
+```
 
-## Modes
+Open http://localhost:5173
+
+## Build for production
+
+```bash
+npm run build
+```
+
+## Deploy to Vercel
+
+Push to GitHub and import the repo at vercel.com — Vercel auto-detects Vite.
+
+## Project structure
+
+```
+src/
+  data/alerts.js          # All alert scenarios (add new ones here)
+  hooks/useTheme.js       # Dark/light mode
+  hooks/useTimer.js       # 45-min exam countdown
+  components/
+    Topbar.jsx
+    Landing.jsx
+    Simulator.jsx
+    Results.jsx
+  App.jsx
+```
+
+## Training modes
 
 | Mode | Description |
 |------|-------------|
-| **Set 1 · Basic** | 8 alerts covering account age, IP mismatch, device, spend pattern |
-| **Set 2 · Intermediate** | 7 alerts adding velocity, merchant type, email risk scoring |
-| **Mixed** | Randomised blend of Set 1 & 2 |
-| **⏱ Set 3 · Exam** | 3 full case studies with 45-minute countdown timer |
-
-## Features
-
-- Randomised alert order every session — students can't memorise answers
-- Reasoning box required before submitting any decision
-- Instant feedback with explanation + red flag / green signal chips
-- Partial credit (5 pts) for Escalate when correct answer is Block (and vice versa)
-- 45-minute countdown timer for exam mode with time-up overlay
-- End-of-session results screen with grade, stats, and per-alert breakdown
-- Print / Save score report (File → Print or Ctrl+P)
-
-## Decisions
-
-- **Approve** — transaction is genuine, allow through
-- **Escalate** — too risky to approve alone, refer to senior analyst
-- **Block** — strong fraud signals, stop the transaction
-
-## Scoring
-
-| Decision | Points |
-|----------|--------|
-| Correct | 10 |
-| Escalate ↔ Block (right direction, wrong severity) | 5 |
-| Incorrect | 0 |
+| Set 1 · Basic | 8 alerts — account age, IP mismatch, device, spend pattern |
+| Set 2 · Intermediate | 7 alerts — velocity, merchant type, email risk |
+| Mixed | Randomised blend of Set 1 & 2 |
+| ⏱ Set 3 · Exam | 3 full case studies, 45-minute timer |
