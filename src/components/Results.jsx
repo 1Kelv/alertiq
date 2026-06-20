@@ -1,15 +1,18 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { saveSession } from '../lib/supabase';
+import Certificate from './Certificate';
 
-export default function Results({ history, score, mode, sessionStart, studentName, onRestart, onHome }) {
-  const saved = useRef(false);
-  const completed = history.length;
-  const maxScore  = completed * 10;
-  const pct       = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-  const elapsed   = sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0;
+export default function Results({ history, score, mode, sessionStart, studentName, cohort, onRestart, onHome }) {
+  const saved      = useRef(false);
+  const [showCert, setShowCert] = useState(false);
+  const completed  = history.length;
+  const maxScore   = completed * 10;
+  const pct        = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  const elapsed    = sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0;
   const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
   const ss = String(elapsed % 60).padStart(2, '0');
   const correct = history.filter(h => h.isCorrect).length;
+  const passed  = pct >= 75;
 
   let gradeClass, gradeLabel, gradeLetter;
   if      (pct >= 90) { gradeLetter='A'; gradeClass='grade-A'; gradeLabel='Outstanding — Ready for live alerts'; }
@@ -23,6 +26,7 @@ export default function Results({ history, score, mode, sessionStart, studentNam
     saved.current = true;
     saveSession({
       student_name: studentName,
+      cohort: cohort || null,
       mode,
       score,
       max_score: maxScore,
@@ -43,21 +47,38 @@ export default function Results({ history, score, mode, sessionStart, studentNam
 
   function printReport() {
     const now = new Date().toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' });
-    const ml = { set1:'Set 1 – Basic', set2:'Set 2 – Intermediate', mixed:'Mixed', exam:'Set 3 – Final Exam' };
+    const ml = { set1:'Set 1 – Basic', set2:'Set 2 – Intermediate', mixed:'Mixed', exam:'Set 3 – Final Exam', idv:'ID&V', kyc:'KYC', chargeback:'Chargebacks' };
     document.getElementById('printMeta').textContent =
-      `Student: ${studentName}  ·  Mode: ${ml[mode]}  ·  Date: ${now}  ·  Score: ${score} pts  ·  ${correct}/${completed} correct`;
+      `Student: ${studentName}  ·  Mode: ${ml[mode] || mode}  ·  Date: ${now}  ·  Score: ${score} pts  ·  ${correct}/${completed} correct`;
     window.print();
+  }
+
+  if (showCert) {
+    return (
+      <Certificate
+        studentName={studentName}
+        mode={mode}
+        score={score}
+        maxScore={maxScore}
+        pct={pct}
+        grade={gradeLabel}
+        gradeLetter={gradeLetter}
+        date={new Date()}
+        onClose={() => setShowCert(false)}
+      />
+    );
   }
 
   return (
     <div className="results-screen show">
       <div className="results-hero">
         <p style={{ fontSize:13, color:'var(--text3)', marginBottom:6 }}>
-          {studentName} · {({ set1:'Set 1 – Basic', set2:'Set 2 – Intermediate', mixed:'Mixed', exam:'Set 3 – Exam' })[mode]}
+          {studentName}{cohort ? ` · ${cohort}` : ''} · {({ set1:'Set 1 – Basic', set2:'Set 2 – Intermediate', mixed:'Mixed', exam:'Set 3 – Exam', idv:'ID&V', kyc:'KYC', chargeback:'Chargebacks' })[mode] || mode}
         </p>
         <h2>Session Complete</h2>
         <div className={`pct ${gradeClass}`}>{pct}%</div>
         <p className="grade-label">{gradeLabel}</p>
+        {passed && <div className="pass-badge">✓ Pass — Certificate available</div>}
       </div>
 
       <div className="results-stats">
@@ -81,6 +102,9 @@ export default function Results({ history, score, mode, sessionStart, studentNam
         })}
       </div>
 
+      {passed && (
+        <button className="cert-btn" onClick={() => setShowCert(true)}>🎓 View & Print Certificate</button>
+      )}
       <button className="report-btn" onClick={printReport}>🖨 Print / Save Score Report</button>
       <button className="restart-btn" onClick={onRestart}>Start New Session</button>
       <button className="back-home-btn" onClick={onHome}>← Back to Home</button>

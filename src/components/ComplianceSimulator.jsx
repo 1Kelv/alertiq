@@ -27,6 +27,7 @@ function fieldClass(key, val) {
 
 export default function ComplianceSimulator({ initialModule = 'idv', onHome }) {
   const [studentName, setStudentName] = useState(null);
+  const [cohort, setCohort]           = useState(null);
   const [module, setModule]           = useState(initialModule);
   const [queue, setQueue]             = useState(() => buildModuleQueue(initialModule));
   const [index, setIndex]             = useState(0);
@@ -81,7 +82,7 @@ export default function ComplianceSimulator({ initialModule = 'idv', onHome }) {
     else { setIndex(nextIndex); setDecided(false); setFeedback(null); if (reasonRef.current) reasonRef.current.value = ''; }
   }
 
-  if (!studentName) return <NameModal onStart={setStudentName} />;
+  if (!studentName) return <NameModal onStart={(n, c) => { setStudentName(n); setCohort(c); }} />;
 
   const config  = MODULE_CONFIG[module];
   const alert   = queue[index];
@@ -96,6 +97,7 @@ export default function ComplianceSimulator({ initialModule = 'idv', onHome }) {
             history={history} score={score} mode={module}
             sessionStart={sessionStart.current}
             studentName={studentName}
+            cohort={cohort}
             onRestart={restart}
             onHome={onHome}
           />

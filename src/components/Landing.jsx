@@ -12,7 +12,7 @@ const COMPLIANCE_MODULES = [
   { tag: 'Disputes', title: '↩ Chargebacks', body: 'Valid disputes vs friendly fraud vs duplicate charges. Uphold or decline with evidence.', mode: 'chargeback' },
 ];
 
-export default function Landing({ onStart, onCompliance, onTrainer }) {
+export default function Landing({ onStart, onCompliance, onTrainer, onProgress }) {
   return (
     <div className="screen active">
       <div className="landing">
@@ -74,6 +74,7 @@ export default function Landing({ onStart, onCompliance, onTrainer }) {
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => onStart('lesson')}>Start Fraud Lesson →</button>
             <button style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }} onClick={() => onCompliance('idv')}>Try ID&V →</button>
+            <button style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }} onClick={() => onStart('progress')}>My Progress →</button>
           </div>
         </div>
 

@@ -17,6 +17,7 @@ function fieldClass(key, val, alert) {
 
 export default function Simulator({ initialMode='set1', onHome }) {
   const [studentName, setStudentName]   = useState(null);
+  const [cohort, setCohort]             = useState(null);
   const [mode, setMode]                 = useState(initialMode);
   const [queue, setQueue]               = useState(() => buildQueue(initialMode));
   const [index, setIndex]               = useState(0);
@@ -30,8 +31,9 @@ export default function Simulator({ initialMode='set1', onHome }) {
   const reasonRef                       = useRef(null);
   const timer = useTimer(() => setTimeUp(true));
 
-  function handleNameSubmit(name) {
+  function handleNameSubmit(name, cohortVal) {
     setStudentName(name);
+    setCohort(cohortVal);
   }
 
   function changeMode(m) {
@@ -97,6 +99,7 @@ export default function Simulator({ initialMode='set1', onHome }) {
             history={history} score={score} mode={mode}
             sessionStart={sessionStart.current}
             studentName={studentName}
+            cohort={cohort}
             onRestart={restart}
             onHome={onHome}
           />
