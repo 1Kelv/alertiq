@@ -3,6 +3,7 @@ import { buildQueue } from '../data/alerts';
 import { useTimer } from '../hooks/useTimer';
 import Results from './Results';
 import NameModal from './NameModal';
+import GlossaryKey from './GlossaryKey';
 
 const MODES = ['set1', 'set2', 'mixed', 'exam'];
 const MODE_LABELS = { set1:'ALERT SET 1 — BASIC', set2:'ALERT SET 2 — INTERMEDIATE', mixed:'MIXED SET', exam:'SET 3 — FINAL EXAM (45 MIN)' };
@@ -110,6 +111,7 @@ export default function Simulator({ initialMode='set1', onHome }) {
 
   return (
     <div className="screen active">
+      <GlossaryKey mode={mode} />
       {timeUp && (
         <div className="overlay show">
           <h2>⏰ Time&apos;s Up!</h2>

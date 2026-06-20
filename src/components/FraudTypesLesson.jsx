@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import GlossaryKey from './GlossaryKey';
 
 const LESSONS = [
   {
@@ -128,6 +129,7 @@ export default function FraudTypesLesson({ onComplete, onHome }) {
 
   return (
     <div className="screen active">
+      <GlossaryKey mode="lesson" />
       <div className="lesson-wrap">
         <div className="lesson-progress-bar">
           <div className="lesson-progress-fill" style={{ width: `${((step) / LESSONS.length) * 100}%` }} />

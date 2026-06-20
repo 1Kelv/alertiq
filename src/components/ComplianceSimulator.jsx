@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { buildModuleQueue } from '../data/idvKycAlerts';
 import Results from './Results';
 import NameModal from './NameModal';
+import GlossaryKey from './GlossaryKey';
 
 const MODULE_CONFIG = {
   idv:        { label: 'ID&V — Identity Verification', decisions: ['Pass', 'Refer', 'Reject'], colors: { Pass: 'dec-approve', Refer: 'dec-escalate', Reject: 'dec-block' } },
@@ -108,6 +109,7 @@ export default function ComplianceSimulator({ initialModule = 'idv', onHome }) {
 
   return (
     <div className="screen active">
+      <GlossaryKey mode={module} />
       <div className="sim-wrap">
         <div className="tabs">
           {TABS.map(t => (
