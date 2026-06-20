@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function NameModal({ onStart }) {
+export default function NameModal({ onStart, onBack }) {
   const [name, setName]     = useState('');
   const [cohort, setCohort] = useState('');
   const [error, setError]   = useState(false);
@@ -38,6 +38,9 @@ export default function NameModal({ onStart }) {
           />
           <button className="modal-btn" type="submit">Start Training →</button>
         </form>
+        {onBack && (
+          <button className="back-home-btn" style={{ marginTop: 12 }} onClick={onBack}>← Back to Home</button>
+        )}
       </div>
     </div>
   );

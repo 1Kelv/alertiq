@@ -86,7 +86,7 @@ export default function Simulator({ initialMode='set1', onHome }) {
     else { setIndex(nextIndex); setDecided(false); setFeedback(null); if (reasonRef.current) reasonRef.current.value = ''; }
   }
 
-  if (!studentName) return <NameModal onStart={handleNameSubmit} />;
+  if (!studentName) return <NameModal onStart={handleNameSubmit} onBack={onHome} />;
 
   const alert    = queue[index];
   const progress = queue.length > 0 ? (index / queue.length) * 100 : 0;

@@ -83,7 +83,7 @@ export default function ComplianceSimulator({ initialModule = 'idv', onHome }) {
     else { setIndex(nextIndex); setDecided(false); setFeedback(null); if (reasonRef.current) reasonRef.current.value = ''; }
   }
 
-  if (!studentName) return <NameModal onStart={(n, c) => { setStudentName(n); setCohort(c); }} />;
+  if (!studentName) return <NameModal onStart={(n, c) => { setStudentName(n); setCohort(c); }} onBack={onHome} />;
 
   const config  = MODULE_CONFIG[module];
   const alert   = queue[index];
