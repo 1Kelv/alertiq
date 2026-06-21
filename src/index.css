@@ -351,6 +351,75 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(
 .builder-add-field-btn { padding:8px 14px; border-radius:8px; border:1px dashed var(--border); background:transparent; color:var(--text3); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; width:fit-content; }
 .builder-add-field-btn:hover { color:var(--text); border-color:var(--text3); }
 
+/* ── CARD PAYMENT FLOW ───────────────────────────────────── */
+.flow-wrap { max-width:700px; margin:0 auto; padding:32px 20px 80px; }
+.flow-header { text-align:center; margin-bottom:36px; }
+.flow-title { font-size:26px; font-weight:800; margin-bottom:8px; }
+.flow-sub { font-size:15px; color:var(--text2); line-height:1.6; max-width:520px; margin:0 auto; }
+.flow-stages { display:flex; flex-direction:column; align-items:center; margin-bottom:28px; }
+.flow-stage-row { display:flex; flex-direction:column; align-items:center; width:100%; }
+.flow-stage-card { display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; width:100%; max-width:560px; cursor:pointer; transition:all 0.15s; }
+.flow-stage-card:hover { border-color:var(--accent); transform:translateX(2px); }
+.flow-stage-card.active { border-color:var(--accent); background:rgba(59,130,246,0.06); }
+.flow-stage-card.highlight { border-color:rgba(239,68,68,0.4); }
+.flow-stage-num { font-size:11px; font-weight:800; color:var(--text3); min-width:18px; }
+.flow-stage-icon { font-size:22px; }
+.flow-stage-info { flex:1; }
+.flow-stage-title { font-size:14px; font-weight:700; color:var(--text); }
+.flow-stage-short { font-size:12px; color:var(--text3); margin-top:2px; }
+.flow-stage-risk { font-size:10px; }
+.flow-arrow { font-size:18px; color:var(--text3); margin:4px 0; }
+.flow-detail-card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:20px; animation:fadeUp 0.2s ease; }
+.flow-detail-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+.flow-detail-icon { font-size:30px; }
+.flow-detail-title { font-size:17px; font-weight:800; margin-bottom:6px; }
+.flow-risk-badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; padding:3px 10px; border-radius:20px; }
+.flow-detail-body { font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:16px; }
+.flow-fraud-box { background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+.flow-fraud-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#f87171; margin-bottom:6px; }
+.flow-fraud-body { font-size:13px; color:var(--text2); line-height:1.6; }
+.flow-signals { margin-top:8px; }
+.flow-signals-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text3); margin-bottom:8px; }
+.flow-signal-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.flow-signal-chip { font-size:11px; padding:3px 10px; border-radius:6px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); color:#fbbf24; }
+.flow-hint { text-align:center; padding:20px; color:var(--text3); font-size:13px; }
+.flow-key-point { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); border-radius:12px; padding:16px 18px; font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
+
+/* ── CAREER PREP ─────────────────────────────────────────── */
+.career-wrap { max-width:800px; margin:0 auto; padding:32px 20px 80px; }
+.career-header { text-align:center; margin-bottom:32px; }
+.career-title { font-size:26px; font-weight:800; margin-bottom:8px; }
+.career-sub { font-size:15px; color:var(--text2); max-width:520px; margin:0 auto; line-height:1.6; }
+.career-tabs { display:flex; gap:4px; flex-wrap:wrap; background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:4px; margin-bottom:28px; }
+.career-tab { flex:1; min-width:140px; padding:10px 12px; border-radius:10px; border:none; background:transparent; color:var(--text3); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; text-align:center; }
+.career-tab.active { background:var(--accent); color:#fff; }
+.career-tab:hover:not(.active) { color:var(--text); }
+.career-content { display:flex; flex-direction:column; gap:12px; }
+.career-section-note { font-size:13px; color:var(--text3); margin-bottom:4px; }
+.career-card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:20px; }
+.career-card-title { font-size:15px; font-weight:700; margin-bottom:8px; color:var(--text); }
+.career-card-body { font-size:13px; color:var(--text2); line-height:1.7; }
+.career-q-card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.career-q-header { width:100%; display:flex; align-items:flex-start; gap:12px; padding:16px 18px; background:transparent; border:none; color:var(--text); cursor:pointer; text-align:left; transition:background 0.15s; }
+.career-q-header:hover { background:var(--bg3); }
+.career-q-num { font-size:11px; font-weight:800; color:var(--accent); min-width:24px; padding-top:1px; }
+.career-q-text { flex:1; font-size:14px; font-weight:600; line-height:1.5; }
+.career-q-toggle { font-size:11px; color:var(--text3); padding-top:2px; }
+.career-q-body { padding:0 18px 18px; border-top:1px solid var(--border); }
+.career-tip-box { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:14px; margin:14px 0 10px; }
+.career-tip-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#fbbf24; margin-bottom:6px; }
+.career-tip-box p { font-size:13px; color:var(--text2); line-height:1.6; }
+.career-answer-box { background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.2); border-radius:10px; padding:14px; }
+.career-answer-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#4ade80; margin-bottom:6px; }
+.career-answer-box p { font-size:13px; color:var(--text2); line-height:1.7; }
+.career-tip-card { display:flex; gap:14px; background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:18px; align-items:flex-start; }
+.career-tip-icon { font-size:24px; flex-shrink:0; }
+.career-tip-title { font-size:14px; font-weight:700; margin-bottom:6px; }
+.career-glossary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+.career-glossary-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.career-glossary-term { font-size:13px; font-weight:800; color:var(--accent); margin-bottom:4px; }
+.career-glossary-def { font-size:12px; color:var(--text2); line-height:1.5; }
+
 /* ── GLOSSARY KEY ────────────────────────────────────────── */
 .glossary-fab { position:fixed; bottom:24px; right:24px; z-index:150; padding:10px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:24px; color:var(--text); font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); transition:all 0.15s; }
 .glossary-fab:hover { background:var(--accent); border-color:var(--accent); color:#fff; }

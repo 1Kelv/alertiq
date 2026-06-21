@@ -51,6 +51,25 @@ export default function Landing({ onStart, onCompliance, onTrainer, onProgress }
           ))}
         </div>
 
+        {/* Foundation Knowledge */}
+        <div className="pillar-header" style={{ marginTop: 64 }}>
+          <div className="pillar-badge" style={{ color:'#22d3ee', background:'rgba(34,211,238,0.1)', border:'1px solid rgba(34,211,238,0.3)' }}>Foundation Knowledge</div>
+          <h2 className="pillar-title">Understand the Bigger Picture</h2>
+          <p className="pillar-sub">Learn how payments work and how to ace your fraud analyst interview.</p>
+        </div>
+        <div className="modes">
+          <div className="mode-card" onClick={() => onStart('flow')}>
+            <div className="mc-tag">Interactive Diagram</div>
+            <h4>💳 Card Payment Flow <span className="mc-arrow">→</span></h4>
+            <p>See how a transaction travels from customer to bank — and where fraud can strike at each stage.</p>
+          </div>
+          <div className="mode-card" onClick={() => onStart('career')}>
+            <div className="mc-tag">Career Prep</div>
+            <h4>🎓 Interview Preparation <span className="mc-arrow">→</span></h4>
+            <p>Common interview questions with model answers, what interviewers look for, and key terms to know.</p>
+          </div>
+        </div>
+
         {/* Pillar 2 — Compliance */}
         <div className="pillar-header" style={{ marginTop: 64 }}>
           <div className="pillar-badge compliance-badge">Financial Crime Compliance</div>

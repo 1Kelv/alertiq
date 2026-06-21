@@ -7,6 +7,8 @@ import ComplianceSimulator from './components/ComplianceSimulator';
 import TrainerDashboard from './components/TrainerDashboard';
 import FraudTypesLesson from './components/FraudTypesLesson';
 import StudentProgress from './components/StudentProgress';
+import CardPaymentFlow from './components/CardPaymentFlow';
+import CareerPrep from './components/CareerPrep';
 
 export default function App() {
   const { theme, toggle } = useTheme();
@@ -17,6 +19,8 @@ export default function App() {
   function startSim(mode) {
     if (mode === 'lesson')   { setScreen('lesson');   window.scrollTo(0,0); return; }
     if (mode === 'progress') { setScreen('progress'); window.scrollTo(0,0); return; }
+    if (mode === 'flow')     { setScreen('flow');     window.scrollTo(0,0); return; }
+    if (mode === 'career')   { setScreen('career');   window.scrollTo(0,0); return; }
     setSimMode(mode); setScreen('sim'); window.scrollTo(0,0);
   }
   function startCompliance(mod) { setComplianceModule(mod); setScreen('compliance'); window.scrollTo(0,0); }
@@ -45,6 +49,8 @@ export default function App() {
       {screen === 'compliance' && <ComplianceSimulator key={complianceModule} initialModule={complianceModule} onHome={goHome} />}
       {screen === 'trainer'    && <TrainerDashboard onBack={goHome} />}
       {screen === 'progress'   && <StudentProgress onHome={goHome} />}
+      {screen === 'flow'       && <CardPaymentFlow onHome={goHome} />}
+      {screen === 'career'     && <CareerPrep onHome={goHome} />}
     </>
   );
 }
